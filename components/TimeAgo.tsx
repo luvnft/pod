@@ -5,10 +5,12 @@ import { timeAgo } from "@/helpers/timeAgo";
 import { LoaderCircle } from "lucide-react";
 
 export function TimeAgo({ time }: { time: string }) {
-  const [localTime, setTLocalTime] = useState<string | null>(null);
+  const [localTime, setLocalTime] = useState<string | null>(null);
+
   useEffect(() => {
-    return setTLocalTime(timeAgo(time));
-  }, [localTime, setTLocalTime]);
+    setLocalTime(timeAgo(time));
+  }, [time]); // Add 'time' as a dependency here
+
   return (
     <div className="h-6">
       {!localTime ? (
@@ -19,3 +21,5 @@ export function TimeAgo({ time }: { time: string }) {
     </div>
   );
 }
+
+

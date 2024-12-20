@@ -1,6 +1,5 @@
 import { CirclePlayIcon } from "lucide-react";
 import Link from "next/link";
-import { GitHubLink } from "@/components/GitHubLink";
 import { cosmic } from "@/cosmic/client";
 import { AuthButtons } from "@/cosmic/blocks/user-management/AuthButtons";
 
@@ -8,10 +7,11 @@ export async function TopNav() {
   const { object: globalSettings } = await cosmic.objects
     .findOne({
       type: "settings",
-      slut: "settings",
+      slug: "settings", // Fixed typo from 'slut' to 'slug'
     })
     .props("metadata")
     .depth(1);
+
   return (
     <div className="w-full gap-4 bg-white dark:bg-black z-10 h-[70px] top-0 fixed border-b dark:border-gray-800 items-center flex px-4 justify-between">
       <div className="flex items-center gap-4">
@@ -25,7 +25,14 @@ export async function TopNav() {
       </div>
       <div className="flex items-center gap-4">
         <div>
-          <GitHubLink />
+          <a
+            href="https://fun.memeco.tv"
+            target="_blank"
+            aria-label="Visit Fun MemeCo"
+            className="text-2xl" // Optional, to make the emoji larger
+          >
+            🤑
+          </a>
         </div>
         <div>
           <AuthButtons />
