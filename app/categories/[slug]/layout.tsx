@@ -1,3 +1,4 @@
+// app/categories/[slug]/layout.tsx
 import { CategoriesList } from "@/cosmic/blocks/videos/CategoriesList";
 import { cosmic } from "@/cosmic/client";
 import { notFound } from "next/navigation";
@@ -40,15 +41,12 @@ export default async function CategoryPage({
   children: React.ReactNode;
   params: { slug: string };
 }>) {
-  // Ensure params is treated correctly (handle as resolved)
-  const resolvedParams = await Promise.resolve(params);
-
   try {
     return (
       <div className="p-4 md:px-8 mb-6">
         <CategoriesList
           query={{ type: "categories" }}
-          activeSlug={resolvedParams.slug} // Use resolvedParams
+          activeSlug={params.slug}
           limit={10}
           skip={0}
           className="mb-6 m-auto flex flex-wrap gap-2"

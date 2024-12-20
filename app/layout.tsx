@@ -1,46 +1,69 @@
-import { CategoriesList } from "@/cosmic/blocks/videos/CategoriesList";
-import { notFound } from "next/navigation";
-import React from "react";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { TopNav } from "@/components/TopNav";
+import { SideBar } from "@/components/SideBar";
+import { TailwindIndicator } from "@/components/tailwind-indicator";
+import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/cosmic/utils";
+import { Footer } from "@/components/Footer";
+import { cosmic } from "@/cosmic/client";
+import { AuthProvider } from "@/cosmic/blocks/user-management/AuthContext";
 
-// Layout is async, params will be resolved automatically by Next.js
-export default async function CategoryPage({
+export const revalidate = 60;
+export const experimental_ppr = true;
+
+const inter = Inter({ subsets: ["latin"] });
+
+export async function generateMetadata() {
+  const { object: globalSettings } = await cosmic.objects
+    .findOne({
+      type: "settings",
+      slut: "settings",
+    })
+    .props(
+      `{
+      metadata {
+        site_title
+        description
+      }
+    }`
+    )
+    .depth(1);
+  return {
+    title: globalSettings.metadata.site_title,
+    description: globalSettings.metadata.description,
+    openGraph: {
+      images: [
+        "https://imgix.cosmicjs.com/daec0820-4dd1-11ef-b1ea-f56c65dfade9-podcast-network-screenshot-3.png?w=2000&auto=forat,compression",
+      ],
+    },
+  };
+}
+
+export default function RootLayout({
   children,
-  params,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-  params: { slug: string }; // Ensuring type consistency
-}) {
-  try {
-    // Fetch the category data using the slug
-    const { object: category } = await cosmic.objects
-      .findOne({
-        slug: params.slug, // Using params.slug directly
-        type: "categories",
-      })
-      .props("title")
-      .depth(1);
-
-    // If no category found, return a 404
-    if (!category) {
-      return notFound();
-    }
-
-    // Render the content
-    return (
-      <div className="p-4 md:px-8 mb-6">
-        <CategoriesList
-          query={{ type: "categories" }}
-          activeSlug={params.slug} // Use params.slug directly
-          limit={10}
-          skip={0}
-          className="mb-6 m-auto flex flex-wrap gap-2"
-        />
-        {children}
-      </div>
-    );
-  } catch (e: any) {
-    // If an error occurs, return 404
-    if (e.status === 404) return notFound();
-    throw e; // Rethrow unexpected errors
-  }
+}>) {
+  return (
+    <html lang="en">
+      <body
+        className={cn(
+          "bg-white dark:bg-black dark:text-gray-400 text-gray-900",
+          inter.className
+        )}
+        data-cosmic-bucket="podcast-network-production"
+      >
+        <AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <TopNav />
+            <SideBar />
+            <div className="md:ml-[80px] mt-[70px]">{children}</div>
+            <TailwindIndicator />
+            <Footer />
+          </ThemeProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  );
 }
